@@ -10,7 +10,7 @@ import {
 
 import { supabase } from "@/lib/supabase";
 import { useAuth } from "./auth";
-import type { EventoAuditoria, StatusTabela, TabelaFrete } from "./types";
+import { REGRAS_PADRAO, type EventoAuditoria, type StatusTabela, type TabelaFrete } from "./types";
 
 const CHAVE = "tabelas-frete:tabelas";
 
@@ -81,25 +81,25 @@ export function TabelasProvider({ children }: { children: ReactNode }) {
 
         if (!error && data && data.length > 0) {
           const convertidas: TabelaFrete[] = data.map((item: any) => ({
-            id: item.id,
-            transportadora: item.transportadora,
+            id: item.id ?? `t-${Math.random().toString(36).slice(2, 9)}`,
+            transportadora: item.transportadora ?? "",
             cnpj: item.cnpj || "",
-            nome: item.nome,
-            modal: item.modal || "rodoviario",
-            abrangencia: item.abrangencia,
+            nome: item.nome ?? "Tabela sem nome",
+            modal: item.modal === "aereo" || item.modal === "fracionado" || item.modal === "lotacao" ? item.modal : "rodoviario",
+            abrangencia: item.abrangencia ?? "",
             vigenciaInicio: item.vigencia_inicio || "",
             vigenciaFim: item.vigencia_fim || "",
-            status: item.status as StatusTabela,
-            versao: item.versao || 1,
+            status: (item.status as StatusTabela) ?? "rascunho",
+            versao: Number(item.versao) || 1,
             origemArquivo: item.origem_arquivo || "",
-            criadoEm: item.criado_em,
+            criadoEm: item.criado_em ?? new Date().toISOString(),
             criadoPor: item.criado_por || "Desconhecido",
-            atualizadoEm: item.atualizado_em,
-            aprovadoPor: item.aprovado_por,
-            aprovadoEm: item.aprovado_em,
+            atualizadoEm: item.atualizado_em ?? new Date().toISOString(),
+            aprovadoPor: item.aprovado_por ?? null,
+            aprovadoEm: item.aprovado_em ?? null,
             substituiId: item.substitui_id || null,
-            regras: item.regras || {},
-            linhas: Array.isArray(item.linhas) ? item.linhas : [],
+            regras: { ...REGRAS_PADRAO, ...(item.regras && typeof item.regras === "object" ? item.regras : {}) },
+            linhas: Array.isArray(item.linhas) ? item.linhas.filter((linha: unknown) => linha && typeof linha === "object") : [],
             auditoria: Array.isArray(item.auditoria) ? item.auditoria : [],
           }));
           const ajustadas = convertidas.map(comVigencia);

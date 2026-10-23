@@ -11,6 +11,7 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as BenchmarkRouteImport } from './routes/benchmark'
+import { Route as ComparativoRouteImport } from './routes/comparativo'
 import { Route as CtesRouteImport } from './routes/ctes'
 import { Route as FornecedoresRouteImport } from './routes/fornecedores'
 import { Route as ImportacaoRouteImport } from './routes/importacao'
@@ -34,6 +35,11 @@ const IndexRoute = IndexRouteImport.update({
 const BenchmarkRoute = BenchmarkRouteImport.update({
   id: '/benchmark',
   path: '/benchmark',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ComparativoRoute = ComparativoRouteImport.update({
+  id: '/comparativo',
+  path: '/comparativo',
   getParentRoute: () => rootRouteImport,
 } as any)
 const CtesRoute = CtesRouteImport.update({
@@ -110,6 +116,7 @@ const TabelasSimuladorRoute = TabelasSimuladorRouteImport.update({
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/benchmark': typeof BenchmarkRoute
+  '/comparativo': typeof ComparativoRoute
   '/ctes': typeof CtesRoute
   '/fornecedores': typeof FornecedoresRoute
   '/importacao': typeof ImportacaoRoute
@@ -128,6 +135,7 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/benchmark': typeof BenchmarkRoute
+  '/comparativo': typeof ComparativoRoute
   '/ctes': typeof CtesRoute
   '/fornecedores': typeof FornecedoresRoute
   '/importacao': typeof ImportacaoRoute
@@ -147,6 +155,7 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/benchmark': typeof BenchmarkRoute
+  '/comparativo': typeof ComparativoRoute
   '/ctes': typeof CtesRoute
   '/fornecedores': typeof FornecedoresRoute
   '/importacao': typeof ImportacaoRoute
@@ -167,6 +176,7 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/benchmark'
+    | '/comparativo'
     | '/ctes'
     | '/fornecedores'
     | '/importacao'
@@ -185,6 +195,7 @@ export interface FileRouteTypes {
   to:
     | '/'
     | '/benchmark'
+    | '/comparativo'
     | '/ctes'
     | '/fornecedores'
     | '/importacao'
@@ -203,6 +214,7 @@ export interface FileRouteTypes {
     | '__root__'
     | '/'
     | '/benchmark'
+    | '/comparativo'
     | '/ctes'
     | '/fornecedores'
     | '/importacao'
@@ -222,6 +234,7 @@ export interface FileRouteTypes {
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   BenchmarkRoute: typeof BenchmarkRoute
+  ComparativoRoute: typeof ComparativoRoute
   CtesRoute: typeof CtesRoute
   FornecedoresRoute: typeof FornecedoresRoute
   ImportacaoRoute: typeof ImportacaoRoute
@@ -252,6 +265,13 @@ declare module '@tanstack/react-router' {
       path: '/benchmark'
       fullPath: '/benchmark'
       preLoaderRoute: typeof BenchmarkRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/comparativo': {
+      id: '/comparativo'
+      path: '/comparativo'
+      fullPath: '/comparativo'
+      preLoaderRoute: typeof ComparativoRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/ctes': {
@@ -358,6 +378,7 @@ declare module '@tanstack/react-router' {
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   BenchmarkRoute: BenchmarkRoute,
+  ComparativoRoute: ComparativoRoute,
   CtesRoute: CtesRoute,
   FornecedoresRoute: FornecedoresRoute,
   ImportacaoRoute: ImportacaoRoute,

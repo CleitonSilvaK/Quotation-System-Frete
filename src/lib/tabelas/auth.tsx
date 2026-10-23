@@ -8,7 +8,7 @@ import {
   type ReactNode,
 } from "react";
 import type { User as SupabaseUser } from "@supabase/supabase-js";
-import { supabase } from "@/lib/supabase";
+import { supabase, supabaseConfigurado } from "@/lib/supabase";
 import type { Usuario } from "./types";
 
 interface AuthContexto {
@@ -25,10 +25,10 @@ function formatarUsuario(sbUser: SupabaseUser): Usuario {
   const meta = sbUser.user_metadata || {};
   return {
     id: sbUser.id,
-    nome: meta.nome || meta.name || sbUser.email?.split("@")[0] || "Usuário",
+    nome: meta["nome"] || meta["name"] || sbUser.email?.split("@")[0] || "Usuário",
     email: sbUser.email || "",
     senha: "",
-    papel: (meta.papel as "admin" | "analista" | "consulta") || "analista",
+    papel: (meta["papel"] as "admin" | "analista" | "consulta") || "analista",
   };
 }
 
@@ -37,14 +37,26 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [pronto, setPronto] = useState(false);
 
   useEffect(() => {
+    if (!supabaseConfigurado) {
+      setPronto(true);
+      return;
+    }
+
     // 1. Check current session
+    let ativo = true;
     supabase.auth.getSession().then(({ data: { session } }) => {
+      if (!ativo) return;
       if (session?.user) {
         setUsuario(formatarUsuario(session.user));
       } else {
         setUsuario(null);
       }
       setPronto(true);
+    }).catch(() => {
+      if (ativo) {
+        setUsuario(null);
+        setPronto(true);
+      }
     });
 
     // 2. Subscribe to auth changes
@@ -60,11 +72,15 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     });
 
     return () => {
+      ativo = false;
       subscription.unsubscribe();
     };
   }, []);
 
   const entrar = useCallback<AuthContexto["entrar"]>(async (email, senha) => {
+    if (!supabaseConfigurado) {
+      return { ok: false, erro: "Supabase não configurado. Preencha VITE_SUPABASE_ANON_KEY no arquivo .env." };
+    }
     try {
       const { data, error } = await supabase.auth.signInWithPassword({
         email: email.trim(),
@@ -86,6 +102,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const cadastrar = useCallback<AuthContexto["cadastrar"]>(
     async (nome, email, senha) => {
+      if (!supabaseConfigurado) {
+        return { ok: false, erro: "Supabase não configurado. Preencha VITE_SUPABASE_ANON_KEY no arquivo .env." };
+      }
       if (nome.trim().length < 3) return { ok: false, erro: "Informe o nome completo." };
       if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) return { ok: false, erro: "E-mail inválido." };
       if (senha.length < 6) return { ok: false, erro: "A senha precisa ter ao menos 6 caracteres." };

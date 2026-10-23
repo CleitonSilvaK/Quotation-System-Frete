@@ -5,7 +5,7 @@ import { cn } from "@/lib/utils";
 interface KpiCardProps {
   titulo: string;
   valor: string;
-  descricao?: string;
+  descricao?: ReactNode;
   detalhe?: ReactNode;
   destaque?: "neutro" | "primario" | "alerta" | "positivo";
   icone?: ReactNode;
@@ -49,7 +49,7 @@ export function PainelSecao({
   className,
 }: {
   titulo: string;
-  descricao?: string;
+  descricao?: ReactNode;
   acoes?: ReactNode;
   children: ReactNode;
   className?: string;

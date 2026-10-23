@@ -8,7 +8,7 @@ import {
   type ReactNode,
 } from "react";
 
-import { supabase } from "@/lib/supabase";
+import { supabase, supabaseConfigurado } from "@/lib/supabase";
 import { useAuth } from "./auth";
 import { REGRAS_PADRAO, type EventoAuditoria, type StatusTabela, type TabelaFrete } from "./types";
 
@@ -73,6 +73,11 @@ export function TabelasProvider({ children }: { children: ReactNode }) {
   // Carregar do Supabase e sincronizar com localStorage
   useEffect(() => {
     async function carregarSupabase() {
+      if (!supabaseConfigurado) {
+        setTabelas(lerLocal().map(comVigencia));
+        setPronto(true);
+        return;
+      }
       try {
         const { data, error } = await supabase
           .from("tabelas_frete")
@@ -106,6 +111,7 @@ export function TabelasProvider({ children }: { children: ReactNode }) {
           setTabelas(ajustadas);
           salvarLocal(ajustadas);
         } else {
+          if (error) console.warn("Não foi possível carregar tabelas do Supabase; usando cópia local.", error.message);
           setTabelas(lerLocal().map(comVigencia));
         }
       } catch {
@@ -123,6 +129,7 @@ export function TabelasProvider({ children }: { children: ReactNode }) {
     salvarLocal(proximas);
 
     // Sync com Supabase no banco de dados
+    if (!supabaseConfigurado) return;
     if (tabelaRemovidaId) {
       try {
         await supabase.from("tabelas_frete").delete().eq("id", tabelaRemovidaId);

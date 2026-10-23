@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useAuth } from "@/lib/tabelas/auth";
+import { supabaseConfigurado } from "@/lib/supabase";
 
 export function LoginGate({ children }: { children: ReactNode }) {
   const { usuario, pronto, entrar, cadastrar } = useAuth();
@@ -53,7 +54,9 @@ export function LoginGate({ children }: { children: ReactNode }) {
           <div>
             <h2 className="text-sm font-semibold">Autenticação Supabase</h2>
             <p className="text-xs text-muted-foreground">
-              Acesso seguro para gestão do sistema de fretes.
+              {supabaseConfigurado
+                ? "Acesso seguro para gestão do sistema de fretes."
+                : "Configure VITE_SUPABASE_ANON_KEY no arquivo .env deste computador."}
             </p>
           </div>
         </div>

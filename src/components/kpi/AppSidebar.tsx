@@ -14,6 +14,7 @@ import {
   Table2,
   Calculator,
   LogOut,
+  CalendarRange,
 } from "lucide-react";
 
 import {
@@ -32,6 +33,7 @@ import { useAuth } from "@/lib/tabelas/auth";
 
 const analise = [
   { titulo: "Dashboard", url: "/", icone: LayoutDashboard },
+  { titulo: "Comparativo de períodos", url: "/comparativo", icone: CalendarRange },
   { titulo: "CT-es", url: "/ctes", icone: FileText },
   { titulo: "Transportadoras", url: "/transportadoras", icone: Truck },
   { titulo: "Fornecedores", url: "/fornecedores", icone: Factory },

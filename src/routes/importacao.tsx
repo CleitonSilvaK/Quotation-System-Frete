@@ -32,13 +32,36 @@ function Importacao() {
     setProcessando(true);
     try {
       const resultados = [];
-      for (const arquivo of Array.from(arquivos)) {
+      const lista = Array.from(arquivos);
+      for (let indice = 0; indice < lista.length; indice++) {
+        const arquivo = lista[indice];
+        if (!arquivo) continue;
+        if (!arquivo.name.toLowerCase().endsWith(".xml")) {
+          resultados.push({
+            record: null,
+            erro: "Formato não suportado. Selecione um arquivo XML.",
+            arquivo: arquivo.name,
+          });
+          continue;
+        }
         const texto = await arquivo.text();
-        resultados.push(parseCTeXml(texto, arquivo.name, true));
+        resultados.push(parseCTeXml(texto, arquivo.name, false));
+        if (indice % 10 === 9) {
+          await new Promise<void>((resolve) => window.setTimeout(resolve, 0));
+        }
       }
       const resumo = substituir ? substituirBase(resultados) : importar(resultados);
-      toast.success(`${numero(resumo.validos)} CT-es importados`, {
-        description: `${numero(resumo.invalidos)} arquivos ignorados, ${numero(resumo.duplicados)} duplicados.`,
+      const descricao = `${numero(resumo.invalidos)} arquivos ignorados, ${numero(resumo.duplicados)} duplicados.`;
+      if (resumo.validos) {
+        toast.success(`${numero(resumo.validos)} CT-es importados`, { description: descricao });
+      } else {
+        toast.error("Nenhum CT-e válido foi importado", {
+          description: resumo.erros[0]?.erro ?? descricao,
+        });
+      }
+    } catch (erro) {
+      toast.error("Erro durante a importação", {
+        description: erro instanceof Error ? erro.message : "Falha ao ler os arquivos selecionados.",
       });
     } finally {
       setProcessando(false);

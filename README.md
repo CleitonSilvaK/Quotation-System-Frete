@@ -1364,3 +1364,16 @@ cd <repository-name>
 npm i
 npm run dev
 ```
+# Configuração do Supabase
+
+As credenciais do Supabase não fazem parte do repositório. Para executar o
+projeto localmente, copie `.env.example` para `.env` e preencha:
+
+```env
+VITE_SUPABASE_URL=https://seu-projeto.supabase.co
+VITE_SUPABASE_ANON_KEY=sua-chave-anon-publica
+```
+
+No provedor de hospedagem, configure essas mesmas variáveis como variáveis de
+ambiente antes do build. Nunca coloque uma chave `service_role` no frontend,
+no `.env.example` ou no repositório.

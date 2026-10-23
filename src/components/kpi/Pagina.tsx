@@ -18,7 +18,7 @@ export function Pagina({
   comFiltros?: boolean;
   children: ReactNode;
 }) {
-  const { carregando, erro, base, registros } = useKpi();
+  const { carregando, erro, base, registros, filtros } = useKpi();
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
@@ -51,6 +51,12 @@ export function Pagina({
       </div>
 
       {comFiltros ? <BarraFiltros /> : null}
+      {comFiltros && base.length > registros.length ? (
+        <div className="rounded-md border border-warning/30 bg-warning/10 px-3 py-2 text-xs text-warning-foreground">
+          {base.length - registros.length} CT-es estão fora dos filtros atuais e não entram nos indicadores.
+          Período selecionado: {filtros.dataInicio} até {filtros.dataFim}.
+        </div>
+      ) : null}
 
       {carregando && mounted ? (
         <div className="panel flex items-center justify-center gap-2 p-12 text-sm text-muted-foreground">
@@ -68,4 +74,3 @@ export function Pagina({
     </div>
   );
 }
-

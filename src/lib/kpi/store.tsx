@@ -7,6 +7,7 @@ import {
   useState,
   type ReactNode,
 } from "react";
+import { useEffect } from "react";
 
 import { aplicarFiltros, consolidar, opcoesDeFiltro, type OpcoesFiltro } from "./dataProcessor";
 import { FILTROS_PADRAO, type CTeRecord, type Filtros, type ImportSummary, type ParseResult } from "./types";
@@ -34,6 +35,17 @@ interface KpiContexto {
 }
 
 const Contexto = createContext<KpiContexto | null>(null);
+const CHAVE_IMPORTADOS = "kpi-fretes:ctes-importados";
+
+function lerImportados(): CTeRecord[] {
+  if (typeof window === "undefined") return [];
+  try {
+    const bruto = window.localStorage.getItem(CHAVE_IMPORTADOS);
+    return bruto ? (JSON.parse(bruto) as CTeRecord[]) : [];
+  } catch {
+    return [];
+  }
+}
 
 async function carregarDataset(): Promise<Dataset> {
   const resposta = await fetch("/data/ctes.json");
@@ -49,10 +61,18 @@ export function KpiProvider({ children }: { children: ReactNode }) {
     enabled: typeof window !== "undefined",
   });
 
-  const [importados, setImportados] = useState<CTeRecord[]>([]);
+  const [importados, setImportados] = useState<CTeRecord[]>(lerImportados);
   const [substituida, setSubstituida] = useState(false);
   const [resumoImportacao, setResumoImportacao] = useState<ImportSummary | null>(null);
   const [filtros, setFiltrosState] = useState<Filtros>(FILTROS_PADRAO);
+
+  useEffect(() => {
+    try {
+      window.localStorage.setItem(CHAVE_IMPORTADOS, JSON.stringify(importados));
+    } catch (erro) {
+      console.warn("Não foi possível persistir os CT-es importados neste navegador.", erro);
+    }
+  }, [importados]);
 
   const base = useMemo(() => {
     const seed = substituida ? [] : (consulta.data?.registros ?? []);

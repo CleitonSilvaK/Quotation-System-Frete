@@ -23,7 +23,7 @@ export const Route = createFileRoute("/importacao")({
 });
 
 function Importacao() {
-  const { importar, substituirBase, resumoImportacao } = useKpi();
+  const { importar, substituirBase, resumoImportacao, base } = useKpi();
   const input = useRef<HTMLInputElement>(null);
   const [processando, setProcessando] = useState(false);
 
@@ -93,7 +93,7 @@ function Importacao() {
           <p className="mt-3 text-xs text-muted-foreground">
             Última importação: {numero(resumoImportacao.validos)} válidos ·{" "}
             {numero(resumoImportacao.invalidos)} inválidos · {numero(resumoImportacao.duplicados)}{" "}
-            duplicados.
+            duplicados. A base atual possui {numero(base.length)} CT-es.
           </p>
         ) : null}
       </PainelSecao>
